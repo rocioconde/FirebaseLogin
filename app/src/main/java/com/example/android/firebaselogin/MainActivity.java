@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
 
@@ -26,9 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView displayText;
     private EditText textToAdd;
     private DatabaseReference userRef = database.getReference();
-
-
-
+    private ArrayList<String> strs = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,18 +49,19 @@ public class MainActivity extends AppCompatActivity {
                     userRef.addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                    textToAdd.add(dataSnapshot.getValue());
-//                            displayString();
+                            strs.add(dataSnapshot.getValue(String.class));
+                            displayString();
+
                         }
 
                         @Override
                         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                            Toast.makeText(MainActivity.this, dataSnapshot.getValue() + " has changed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, dataSnapshot.getValue(String.class) + " has changed", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
                         public void onChildRemoved(DataSnapshot dataSnapshot) {
-                            Toast.makeText(MainActivity.this, dataSnapshot.getValue() + " is removed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, dataSnapshot.getValue(String.class) + " was removed", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -80,14 +81,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-//    private void displayString() {
-//        String text = "";
-//        for (String s: )
-//        {
-//            text += s + "\n";
-//        }
-//        displayText.setText(text);
-//    }
 
     @Override
     protected void onStart() {
@@ -108,8 +101,17 @@ public class MainActivity extends AppCompatActivity {
         userRef.push().setValue(textToAdd.getText().toString());
     }
 
+    private void displayString() {
+        String text = "";
+        for (String s : strs) {
+            text += s + "\n";
+            displayText.setText(text);
+
+        }
+
+    }
+
     public void signOut(View view) {
         auth.signOut();
-
     }
 }

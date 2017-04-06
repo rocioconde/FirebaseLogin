@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener authListener;
     private TextView displayText;
     private EditText textToAdd;
-    private DatabaseReference userRef = database.getReference();
+    private DatabaseReference userRef = database.getReference("user");
     private ArrayList<String> strs = new ArrayList<>();
 
     @Override
@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 if (user == null)
                     startActivity(new Intent(MainActivity.this, LogInActivity.class));
                 else {
+                    userRef = database.getReference(user.getUid());
                     userRef.addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -56,12 +57,12 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                            Toast.makeText(MainActivity.this, dataSnapshot.getValue(String.class) + " has changed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, dataSnapshot.getValue(MainActivity.class) + " has changed", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
                         public void onChildRemoved(DataSnapshot dataSnapshot) {
-                            Toast.makeText(MainActivity.this, dataSnapshot.getValue(String.class) + " was removed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, dataSnapshot.getValue(MainActivity.class) + " was removed", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -103,15 +104,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayString() {
         String text = "";
-        for (String s : strs) {
+        for (String s : strs)
             text += s + "\n";
             displayText.setText(text);
-
-        }
 
     }
 
     public void signOut(View view) {
         auth.signOut();
+        strs.clear();
+        displayText.setText("");
+
+
     }
 }
